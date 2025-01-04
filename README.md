@@ -5,7 +5,7 @@
 [Fahad Shahbaz Khan](https://scholar.google.com/citations?hl=en&user=zvaeYnUAAAAJ)
 
 
-[![page](https://img.shields.io/badge/Project-Page-F9D371)](https://asif-hanif.github.io/saa/)
+[comment]: [![page](https://img.shields.io/badge/Project-Page-F9D371)](https://asif-hanif.github.io/saa/)
 [![paper](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)]()
 
 
