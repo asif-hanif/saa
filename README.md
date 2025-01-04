@@ -15,7 +15,7 @@
 
 | ![main figure](/media/saa_isbi.png)|
 |:--| 
-| <p align="justify">...</p> |
+| <p align="justify">**Spectrum Adversarial Attack** $(\mathsf{SA}^2)$ partitions the clean volumetric image into 3D patches, applies 3D-DCT to each patch, and amplifies/attenuates the DCT coefficients using multiplicative spectral noise $(\xi)$. The perturbed spectrum is then converted back to the voxel domain via 3D-IDCT. The loss gradient flow to $\xi$ is shown by the black dashed line.</p> |
 
 </br>
 <hr />
