@@ -26,16 +26,15 @@ In safety-critical domains like healthcare, resilience of deep learning models t
 <br><br>
 </i></p>
 
-> <b>TLDR:</b> We adapt vision-language prompt learning methods for audio-language models and introduce PALM, a new method that is computationally efficient and outperforms or matches baselines in audio classification across 11 datasets.
+> <b>TLDR:</b> A novel frequency domain attack on 3D medical segmentation exposes vulnerabilities, achieving high fooling rates, low cost, and superior transferability while preserving perceptual quality.
 
 </br>
 </br>
 
 ## Updates :rocket:
-- **Sep 20, 2024** : Accepted in [EMNLP (Main) 2024](https://2024.emnlp.org/) &nbsp;&nbsp; :confetti_ball: :tada:
-- **Sep 25, 2024** : Released code for PALM
-- **Sep 28, 2024** : Released instructions for preparing datasets  
+- **Jan 03, 2025** : Accepted in [ISBI 2025]([https://2024.emnlp.org/](https://biomedicalimaging.org/2025/?__hstc=51849206.b421461b571f5471d6d9b6722d06a2b7.1733757041685.1735923468221.1735969456813.7&__hssc=51849206.1.1735969456813&__hsfp=1009270598)) &nbsp;&nbsp; :confetti_ball: :tada:
 
+<!---
 </br>
 </br>
 
@@ -238,5 +237,7 @@ Should you have any questions, please create an issue on this repository or cont
 We used [PENGI](https://github.com/microsoft/Pengi) for model instantiation and borrowed a part of code from [COOP/COCOOP](https://github.com/KaiyangZhou/CoOp) to implement baselines. We thank the respective authors for releasing the code.
 
 <hr />
+
+-->
 
 
