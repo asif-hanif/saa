@@ -42,11 +42,10 @@ In safety-critical domains like healthcare, resilience of deep learning models t
 ## Table of Contents
 - [Installation](#installation)
 - [Model](#model)
-- [Datasets](#datasets)
+- [Datasets](#dataset)
 - [Code Structure](#code-structure)
-- [Run Experiments](#run-experiments)
+- [Experiments](#experiments)
 - [Results](#results)
-- [Citation](#citation)
 - [Contact](#contact)
 - [Acknowledgement](#acknowledgement)
 
@@ -64,12 +63,19 @@ conda activate saa
 2. Install PyTorch and other dependencies
 ```shell
 git clone https://github.com/asif-hanif/saa
-cd palm
+cd saa
 pip install -r requirements.txt
 ```
 
 
+<a name="model"/>
 
+## Model
+We have used three volumetric medical image segmentation models: [UNET](), [UNETR]() and [Swin-UNETR]()
+
+
+
+<a name="dataset"/>
 
 ## Dataset
 We conducted experiments on two volumetric medical image segmentation datasets: [Synapse](https://www.synapse.org/#!Synapse:syn3193805/wiki/217789), [ACDC](https://www.creatis.insa-lyon.fr/Challenge/acdc/databases.html). Synapse contains 14 classes (including background) and ACDC contains 4 classes (including background). We follow the same dataset preprocessing as in [nnFormer](https://github.com/282857341/nnFormer). 
@@ -91,48 +97,60 @@ DATASET_SYNAPSE/
     ├── dataset_synapse_18_12.json
  ```
 
-File `dataset_synapse_18_12.json` contains train-val split (created from train files) of Synapse datatset. There are 18 train images and 12 validation images. File `dataset_synapse_18_12.json` can be accessed [here](miscellaneous/dataset_synapse_18_12.json). Place this file in datatset parent folder. Pre-processed Synapse dataset can be downloaded from the following link as well.
+File `dataset_synapse_18_12.json` contains train-val split (created from train files) of Synapse dataset. There are 18 train images and 12 validation images. File `dataset_synapse_18_12.json` can be accessed [here](miscellaneous/dataset_synapse_18_12.json). Place this file in dataset parent folder. Pre-processed Synapse dataset can be downloaded from the following link as well.
 
 | Dataset | Link |
 |:-- |:-- |
 | BTCV-Synapse (18-12 split) | [Download](https://drive.google.com/file/d/1-Tst3l2kMrC0rlNGDM9CwvRk_2KRFXOo/view?usp=sharing) |
 
-You can use the command `tar -xzf btcv-synapse.tar.gz` to un-compress the file.
+You can use the command `tar -xzf btcv-synapse.tar.gz` to uncompress the file.
 
 </br>
 
-## Model
-We use [UNETR](https://openaccess.thecvf.com/content/WACV2022/papers/Hatamizadeh_UNETR_Transformers_for_3D_Medical_Image_Segmentation_WACV_2022_paper.pdf) model with following parameters:
-```python
-model = UNETR(
-    in_channels=1,
-    out_channels=14,
-    img_size=(96,96,96),
-    feature_size=16,
-    hidden_size=768,
-    mlp_dim=3072,
-    num_heads=12,
-    pos_embed="perceptron",
-    norm_name="instance",
-    conv_block=True,
-    res_block=True,
-    dropout_rate=0.0)
+</br>
+
+<a name="code-structure"/>
+
+## Code Structure
+The repository is organized as follows:
 
 ```
+saa/
+├── attacks/                    # Adversarial attack implementations
+│   ├── saa/                   # Spectrum Adversarial Attack (SAA) implementation
+│   │   ├── saa.py            # Main SAA attack class (3D)
+│   │   ├── compression.py    # 3D-DCT compression utilities
+│   │   ├── decompression.py  # 3D-IDCT decompression utilities
+│   │   └── utils.py          # SAA helper functions
+│   ├── vafa/                  # VAFA attack implementation (baseline)
+│   │   ├── vafa.py           # VAFA attack class
+│   │   └── ...
+│   ├── pgd.py                # Projected Gradient Descent attack
+│   ├── fgsm.py               # Fast Gradient Sign Method attack
+│   ├── bim.py                # Basic Iterative Method attack
+│   └── gn.py                 # Gaussian Noise attack
+├── utils/                     # Utility functions
+│   ├── data_utils.py         # Dataset loading and preprocessing
+│   ├── get_args.py           # Command-line argument parsing
+│   └── utils.py              # General utility functions
+├── optimizers/                # Optimizer implementations
+│   └── lr_scheduler.py       # Learning rate schedulers
+├── trainer.py                 # Training loop implementation
+├── generate_adv_samples.py   # Script to generate adversarial samples
+├── inference_on_saved_adv_samples.py  # Script for inference on saved adversarial samples
+├── run_normal_or_adv_training.py      # Script for normal or adversarial training
+├── miscellaneous/            # Miscellaneous files
+│   └── dataset_synapse_18_12.json  # Dataset split file
+└── media/                    # Media files (figures, images)
+```
 
-We also used [UNETR++](https://arxiv.org/abs/2212.04497) in our experiments but its code is not in a presentable form. Therefore, we are not including support for UNETR++ model in this repository. 
+The main attack implementations are located in the `attacks/` directory. The SAA (Spectrum Adversarial Attack) implementation is in `attacks/saa/`, which contains the core frequency-domain attack using 3D-DCT transformations. The `utils/` directory contains data loading, preprocessing, and general utility functions. Training and inference scripts are in the root directory.
 
-Clean and adversarially trained (under VAFA attack) [UNETR](https://openaccess.thecvf.com/content/WACV2022/papers/Hatamizadeh_UNETR_Transformers_for_3D_Medical_Image_Segmentation_WACV_2022_paper.pdf) models can be downloaded from the links given below. Place these models in a directory and give full path of the model (including name of the model e.g. `/folder_a/folder_b/model.pt`) in argument `--pretrained_path` to attack that model.
+</br>
 
-| Dataset | Model | Link |
-|:-- |:-- |:-- | 
-|Synapse | Clean UNETR $(\mathcal{M})$ | [Download](https://mbzuaiac-my.sharepoint.com/:u:/g/personal/asif_hanif_mbzuai_ac_ae/EaaTHPv6MGZGnDdwDYQRO9YBTGE3_87veLEXDG1V4uHjaw?e=XyLc61)|
-|Synapse | Adversarially Trained (under VAFA) UNETR $(\mathcal{M}_{{\mathrm{VAFA-FR}}})$  | [Download](https://mbzuaiac-my.sharepoint.com/:u:/g/personal/asif_hanif_mbzuai_ac_ae/EVji-stXEFVChGViXw2se1kBFO1SPR4H1F2FGJKWYR-QLQ?e=ATeSnN)|
-|Synapse | Adversarially Trained (under VAFA, **without** Frequecny Regularization Eq. 4 and dice loss on clean images ) UNETR $(\mathcal{M}_{{\mathrm{VAFA}}})$ | [Download](https://mbzuaiac-my.sharepoint.com/:u:/g/personal/asif_hanif_mbzuai_ac_ae/EflJdtvNAA1AsbHAVOsVlCcBqXsEz1uNep8iEphSO_bFWA?e=q4BYS0)|
+<a name="launch-saa-attack-on-the-model"/>
 
-
-
-## Launch VAFA Attack on the Model
+## Launch SAA Attack on the Model
 ```shell
 python generate_adv_samples.py --model_name unet-r --feature_size=16 --infer_overlap=0.5 \
 --dataset btcv --data_dir=<PATH_OF_DATASET> \
@@ -141,11 +159,13 @@ python generate_adv_samples.py --model_name unet-r --feature_size=16 --infer_ove
 --pretrained_path=<PATH_OF_PRETRAINED_MODEL>  \
 --gen_val_adv_mode \
 --save_adv_images_dir=<PATH_TO_SAVE_ADV_TEST_IMAGES> \
---attack_name vafa-3d --q_max 20 --steps 20 --block_size 32 32 32 --use_ssim_loss --debugging
+--attack_name saa --rho 0.2 --steps 20 --block_size 32 32 32 --lambda_dice 0.01 --use_ssim_loss --debugging
 ```
-If adversarial images are not intended to be saved, use `--debugging` argument. If `--use_ssim_loss` is not mentioned, SSIM loss will not be used in the adversarial objective (Eq. 2). If adversarial versions of train images are inteded to be generated, mention argument `--gen_train_adv_mode` instead of `--gen_val_adv_mode`.
+If adversarial images are not intended to be saved, use `--debugging` argument. If `--use_ssim_loss` is not mentioned, SSIM loss will not be used in the adversarial objective. If adversarial versions of train images are intended to be generated, mention argument `--gen_train_adv_mode` instead of `--gen_val_adv_mode`.
 
-For VAFA attack on each 2D slice of volumetric image, use : `--attack_name vafa-2d --q_max 20 --steps 20 --block_size 32 32 --use_ssim_loss`
+For SAA attack on each 2D slice of volumetric image, use : `--attack_name saa-2d --rho 0.2 --steps 20 --block_size 32 32 --lambda_dice 0.01 --use_ssim_loss`
+
+**Note**: The codebase also supports VAFA attack variants. For VAFA-3D, use: `--attack_name vafa-3d --q_max 20 --steps 20 --block_size 32 32 32 --use_ssim_loss`. For VAFA-2D, use: `--attack_name vafa-2d --q_max 20 --steps 20 --block_size 32 32 --use_ssim_loss`
 
 Use following arguments when launching pixel/voxel domain attacks:
 
@@ -157,7 +177,9 @@ Use following arguments when launching pixel/voxel domain attacks:
 
 [GN](https://adversarial-attacks-pytorch.readthedocs.io/en/latest/attacks.html#module-torchattacks.attacks.gn):&nbsp;&nbsp;&nbsp;&nbsp;   `--attack_name gn --steps 20 --eps 4 --alpha 0.01 --std 4`
 
-## Launch Adversarial Training (VAFT) of the Model
+<a name="launch-adversarial-training-of-the-model"/>
+
+## Launch Adversarial Training of the Model
 ```shell
 python run_normal_or_adv_training.py --model_name unet-r --in_channels 1 --out_channel 14 --feature_size=16 --batch_size=3 --max_epochs 5000 --optim_lr=1e-4 --lrschedule=warmup_cosine --infer_overlap=0.5 \
 --save_checkpoint \
@@ -168,11 +190,13 @@ python run_normal_or_adv_training.py --model_name unet-r --in_channels 1 --out_c
 --save_model_dir=<PATH_TO_SAVE_ADVERSARIALLY_TRAINED_MODEL> \
 --val_every 15 \
 --adv_training_mode --freq_reg_mode \
---attack_name vafa-3d --q_max 20 --steps 20 --block_size 32 32 32 --use_ssim_loss 
+--attack_name saa --rho 0.2 --steps 20 --block_size 32 32 32 --lambda_dice 0.01 --use_ssim_loss 
 ```
 
-Arugument `--adv_training_mode` in conjunction with `--freq_reg_mode` performs adversarial training with dice loss on clean images, adversarial images and frequency regularization term (Eq. 4) in the objective function (Eq. 3). For vanilla adversarial training (i.e. dice loss on adversarial images), use only `--adv_training_mode`. For normal training of the model, do not mention these two arguments. 
+Argument `--adv_training_mode` in conjunction with `--freq_reg_mode` performs adversarial training with dice loss on clean images, adversarial images and frequency regularization term in the objective function. For vanilla adversarial training (i.e. dice loss on adversarial images only), use only `--adv_training_mode`. For normal training of the model, do not mention these two arguments. 
 
+
+<a name="inference-on-the-model-with-already-saved-adversarial-images"/>
 
 ## Inference on the Model with already saved Adversarial Images
 If adversarial images have already been saved and one wants to do inference on the model using saved adversarial images, use following command:
@@ -184,11 +208,13 @@ python inference_on_saved_adv_samples.py --model_name unet-r --in_channels 1 --o
 --use_pretrained \
 --pretrained_path=<PATH_OF_PRETRAINED_MODEL>  \
 --adv_images_dir=<PATH_OF_SAVED_ADVERSARIAL_IMAGES> \ 
---attack_name vafa-3d --q_max 20 --steps 20 --block_size 32 32 32 --use_ssim_loss 
+--attack_name saa --rho 0.2 --steps 20 --block_size 32 32 32 --lambda_dice 0.01 --use_ssim_loss 
 ```
 
-Attack related arguments are used to automatically find the sub-folder containing adversarial images. Sub-folder should be present in parent folder path specified by `--adv_images_dir` argument.  If `--no_sub_dir_adv_images` is mentioned, sub-folder will not be searched and images are assumed to be present directly in the parent folder path specified by `--adv_images_dir` argument. Structure of dataset folder should be same as specified in [Datatset](##dataset) section.
+Attack related arguments are used to automatically find the sub-folder containing adversarial images. Sub-folder should be present in parent folder path specified by `--adv_images_dir` argument. If `--no_sub_dir_adv_images` is mentioned, sub-folder will not be searched and images are assumed to be present directly in the parent folder path specified by `--adv_images_dir` argument. Structure of dataset folder should be same as specified in [Dataset](#dataset) section.
 
+
+<a name="citation"/>
 
 ## Citation
 If you find our work, or this repository useful, please consider giving a star :star: and citation.
@@ -205,185 +231,18 @@ If you find our work, or this repository useful, please consider giving a star :
 
 <hr />
 
+<a name="contact"/>
+
 ## Contact
 Should you have any question, please create an issue on this repository or contact at **asif.hanif@mbzuai.ac.ae**
 
 <hr />
 
-
-
-<!---
-</br>
-<a name="model"/>
-    
-## Model :white_square_button:
-We have shown the efficacy of PALM and other baselines (ZERO-SHOT, COOP, COCOOP) using [PENGI](https://github.com/microsoft/Pengi) model. 
-
-Download the pre-trained PENGI model using the link provided below and place the checkpoint file at path [`pengi/configs`](/pengi/configs) (after clonning the repo). 
-
-
-| Model | Link | Size |
-|:-- |:-- | :-- |
-| PENGI | [Download](https://zenodo.org/records/8387083/files/base.pth) | 2.2 GB | 
-
-<br>
-
-PENGI checkpoint can also be downloaded with following command:
-```bash
-wget https://zenodo.org/records/8387083/files/base.pth
-```
-
-</br>
-
-<a name="datasets"/>
-    
-## Datasets :page_with_curl:
-
-We have performed experiments on 11 audio classification datasets.  Instructions for downloading/processing datasets used by our method have been provided in the [DATASETS.md](DATASETS.md). All of the datasets have been uploaded on HuggingFace Datasets Hub :hugs: for easy access. We have also provided a [Jupyter Notebook](/media/DownloadAudioDatasets.ipynb) to download all datasets in one go. It might take some time to download all datasets, so we recommend running the notebook on a cloud instance or a machine with good internet speed.
-
-| Dataset | Type | Classes | Size | Link |
-|:-- |:-- |:--: |--: |:-- |
-| [Beijing-Opera](https://compmusic.upf.edu/bo-perc-dataset) | Instrument Classification | 4 | 69 MB | [Instructions](DATASETS.md#beijing-opera) |
-| [CREMA-D](https://github.com/CheyneyComputerScience/CREMA-D) | Emotion Recognition | 6 | 606 MB | [Instructions](DATASETS.md#crema-d) |
-| [ESC50](https://github.com/karolpiczak/ESC-50) | Sound Event Classification | 50 | 881 MB | [Instructions](DATASETS.md#esc50) |
-| [ESC50-Actions](https://github.com/karolpiczak/ESC-50) | Sound Event Classification | 10 | 881 MB | [Instructions](DATASETS.md#esc50-actions) |
-| [GT-Music-Genre](https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification) | Music Analysis | 10 | 1.3 GB | [Instructions](DATASETS.md#gt-music-genre) |
-| [NS-Instruments](https://magenta.tensorflow.org/datasets/nsynth) | Instrument Classification | 10 | 18.5 GB | [Instructions](DATASETS.md#ns-instruments) |
-| [RAVDESS](https://zenodo.org/records/1188976#.YFZuJ0j7SL8) | Emotion Recognition | 8 | 1.1 GB | [Instructions](DATASETS.md#ravdess) |
-| [SESA](https://zenodo.org/records/3519845) | Surveillance Sound Classification | 4 | 70 MB | [Instructions](DATASETS.md#sesa) |
-| [TUT2017](https://zenodo.org/records/400515) | Acoustic Scene Classification | 15 | 12.3 GB | [Instructions](DATASETS.md#tut2017) |
-| [UrbanSound8K](https://urbansounddataset.weebly.com/urbansound8k.html) | Sound Event Classification | 10 | 6.8 GB | [Instructions](DATASETS.md#urbansound8k) |
-| [VocalSound](https://github.com/YuanGongND/vocalsound) | Vocal Sound Classification | 6 | 8.2 GB | [Instructions](DATASETS.md#vocalsound) |
-
-</br>
-</br>
-
-All datasets should be placed in a directory named `Audio-Datasets` and the path of this directory should be specified in the variable `DATASET_ROOT` in the shell [`scripts`](/scripts/). Once all datasets have been downloaded, the directory structure should look like as follows:
-```
-Audio-Datasets/
-    ├── Beijing-Opera/
-    ├── CREMA-D/
-    ├── ESC50/ 
-    ├── ESC50-Actions/
-    ├── GT-Music-Genre/
-    ├── NS-Instruments/
-    ├── RAVDESS/
-    ├── SESA/
-    ├── TUT2017/
-    ├── UrbanSound8K/
-    ├── VocalSound/
- ```
-
-
-</br>
-
-<a name="code-structure"/>
-
-## Code Structure :snowflake:
-There are three main folders in this repo: `pengi`, `palm`, `utils`. Code in [`pengi`](/pengi) folder is taken from [PENGI](https://github.com/microsoft/Pengi) repo for model instantiation. Implementation of baselines (`zeroshot`, `coop`, `cocoop`) and our method `palm` is in [`palm`](/palm) folder. Class definitions of audio and text encoder of PENGI model can be found in [`palm/encoders.py`](/palm/encoders.py) file. Training and dataset related code is in [`utils`](/utils) folder.
-
-</br>
-
-<a name="run-experiments"/>
-
-## Run Experiments :zap:
-
-We have performed all experiments on `NVIDIA A100-SXM4-40GB` GPU. Shell scripts to run experiments can be found in [`scripts`](/scripts/) folder. 
-
-```shell
-## General Command Structure
-bash  <SHELL_SCRIPT>  <METHOD_NAME>
-```
-
-Following methods (including `palm`) are supported in this repository:
-
-`zeroshot` `coop` `cocoop` `palm`
-
-Examples to run `palm` method on different audio classifiction datasets have been provided below:
-
-```shell
-bash scripts/beijing_opera.sh palm
-bash scripts/crema_d.sh palm
-bash scripts/esc50_actions.sh palm
-bash scripts/esc50.sh palm
-bash scripts/gt_music_genre.sh palm
-bash scripts/ns_instruments.sh palm
-bash scripts/ravdess.sh palm
-bash scripts/sesa.sh palm
-bash scripts/tut.sh palm
-bash scripts/urban_sound.sh palm
-bash scripts/vocal_sound.sh palm
-```
-
-Results are saved in `json` format in [`logs`](/logs) directory. To process results (take an average across all folds/seeds and print), run the following command (after running all experiments):
-
-```bash
-cd logs
-bash results.sh
-```
-
-<details>
-<summary>Sample Output</summary>
-
-![main figure](/media/print_results.png)
-
-</details>
-
-**Note** For multi-fold datasets, we run experiments using cross-validation and then report average results on each seed. 
-
-</br>
-
-<a name="results"/>
-
-## Results :microscope:
-
-<div class="content has-text-justified"><p>
-<b>Comparison of PALM with Baselines</b> The accuracy scores of the baselines (<a href=”https://github.com/microsoft/Pengi”>ZERO-SHOT</a>, <a href="https://github.com/KaiyangZhou/CoOp">COOP</a> and <a href="https://github.com/KaiyangZhou/CoOp">COCOOP</a>, and our proposed method PALM) across 11 datasets are presented. For each method (except ZERO SHOT), experiments were performed using three different seeds. The accuracy scores for all seeds are reported, along with the average score. Bold values indicate the best average score in each row. Compared to the baselines, our proposed method achieves favorable results, with an average improvement of 5.5% over COOP and 3.1% over COCOOP. It should be noted that both COOP and COCOOP are computationally expensive, as these approaches require loss gradients to flow through the text encoder. Additionally, COCOOP has a feedback loop from audio features to the input space of the text encoder, making it even more computationally expensive. On the other hand, PALM is relatively less computationally expensive.
-</p></div>
-
-![main figure](/media/results.png)
-
-</br>
-</br>
-
-<div class="content has-text-justified">
-<p align="justify"><b>Comparison of PALM<sup>&dagger;</sup> and PALM</b> Here, <b>PALM<sup>&dagger;</sup></b> refers to setting in which the <i>Learnable Context</i> embeddings have been <b>removed</b> from the feature space of the text encoder. The removal of context embeddings drastically degrades performance, highlighting their importance.</p>
-</div>
-
-![main figure](/media/palm_vs_palm_dagger.png)
-
-
-</br>
-
-<a name="citation"/>
-
-## Citation :star:
-If you find our work, this repository, or pretrained models useful, please consider giving a star :star: and citation.
-```bibtex
-@article{hanif2024palm,
-  title={PALM: Few-Shot Prompt Learning for Audio Language Models},
-  author={Hanif, Asif and Agro, Maha Tufail and Qazi, Mohammad Areeb and Aldarmaki, Hanan},
-  journal={arXiv preprint arXiv:2409.19806},
-  year={2024}
-}
-```
-
-</br>
-
-<a name="contact"/>
-
-## Contact :mailbox:
-Should you have any questions, please create an issue on this repository or contact us at **asif.hanif@mbzuai.ac.ae**
-
-</br>
-
 <a name="acknowledgement"/>
 
-## Acknowledgement :pray:
-We used [PENGI](https://github.com/microsoft/Pengi) for model instantiation and borrowed a part of code from [COOP/COCOOP](https://github.com/KaiyangZhou/CoOp) to implement baselines. We thank the respective authors for releasing the code.
+## Acknowledgement
+We thank the authors of [UNETR](https://github.com/Project-MONAI/research-contributions/tree/main/UNETR/BTCV), [nnFormer](https://github.com/282857341/nnFormer), and [MONAI](https://github.com/Project-MONAI/MONAI) for releasing their code and models.
 
 <hr />
-
--->
 
 
