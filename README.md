@@ -183,17 +183,16 @@ If adversarial images have already been saved and one wants to do inference on t
 
 ```
 
-
-## Results :microscope:
+</br>
+</br>
 
 <a name="results"/>
 
 ## Results :microscope:
 
-<div class="content has-text-justified"><p>
+![main figure](/media/main-results.png)
 
-
-![main figure](/media/attack_and_defense_results.png)
+![main figure](/media/perturbations.png)
 
 </br>
 </br>
