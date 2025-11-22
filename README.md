@@ -159,48 +159,19 @@ The main attack implementations are located in the `attacks/` directory. The SAA
 
 ## Launch SAA Attack on the Model
 ```shell
-python generate_adv_samples.py --model_name unet-r --feature_size=16 --infer_overlap=0.5 \
---dataset btcv --data_dir=<PATH_OF_DATASET> \
---json_list=dataset_synapse_18_12.json \
+python generate_adv_samples.py --model_name unet --in_channels 1 --out_channel 14 --feature_size=16 --infer_overlap=0.5 \
+--dataset btcv --data_dir $DATA/Medical-Datasets/volumetric-med-seg/btcv-synapse/ \
+--json_list dataset_synapse_18_12.json \
 --use_pretrained \
---pretrained_path=<PATH_OF_PRETRAINED_MODEL>  \
+--pretrained_path=$DATA/Pre-Trained-Models/Volumetric-Med-Seg/unet/unet_synapse_18_12_clean/model_best.pt  \
 --gen_val_adv_mode \
---save_adv_images_dir=<PATH_TO_SAVE_ADV_TEST_IMAGES> \
---attack_name saa --rho 0.2 --steps 20 --block_size 32 32 32 --lambda_dice 0.01 --use_ssim_loss --debugging
-```
-If adversarial images are not intended to be saved, use `--debugging` argument. If `--use_ssim_loss` is not mentioned, SSIM loss will not be used in the adversarial objective. If adversarial versions of train images are intended to be generated, mention argument `--gen_train_adv_mode` instead of `--gen_val_adv_mode`.
-
-For SAA attack on each 2D slice of volumetric image, use : `--attack_name saa-2d --rho 0.2 --steps 20 --block_size 32 32 --lambda_dice 0.01 --use_ssim_loss`
-
-**Note**: The codebase also supports VAFA attack variants. For VAFA-3D, use: `--attack_name vafa-3d --q_max 20 --steps 20 --block_size 32 32 32 --use_ssim_loss`. For VAFA-2D, use: `--attack_name vafa-2d --q_max 20 --steps 20 --block_size 32 32 --use_ssim_loss`
-
-Use following arguments when launching pixel/voxel domain attacks:
-
-[PGD](https://adversarial-attacks-pytorch.readthedocs.io/en/latest/attacks.html#module-torchattacks.attacks.pgd):&nbsp;&nbsp;&nbsp;        `--attack_name pgd --steps 20 --eps 4 --alpha 0.01`
-
-[FGSM](https://adversarial-attacks-pytorch.readthedocs.io/en/latest/attacks.html#module-torchattacks.attacks.fgsm):             `--attack_name fgsm --steps 20 --eps 4 --alpha 0.01`
-
-[BIM](https://adversarial-attacks-pytorch.readthedocs.io/en/latest/attacks.html#module-torchattacks.attacks.bim):&nbsp;&nbsp;&nbsp;        `--attack_name bim --steps 20 --eps 4 --alpha 0.01`
-
-[GN](https://adversarial-attacks-pytorch.readthedocs.io/en/latest/attacks.html#module-torchattacks.attacks.gn):&nbsp;&nbsp;&nbsp;&nbsp;   `--attack_name gn --steps 20 --eps 4 --alpha 0.01 --std 4`
-
-<a name="launch-adversarial-training-of-the-model"/>
-
-## Launch Adversarial Training of the Model
-```shell
-python run_normal_or_adv_training.py --model_name unet-r --in_channels 1 --out_channel 14 --feature_size=16 --batch_size=3 --max_epochs 5000 --optim_lr=1e-4 --lrschedule=warmup_cosine --infer_overlap=0.5 \
---save_checkpoint \
---dataset btcv --data_dir=<PATH_OF_DATASET> \
---json_list=dataset_synapse_18_12.json \
---use_pretrained \
---pretrained_path=<PATH_OF_PRETRAINED_MODEL>  \
---save_model_dir=<PATH_TO_SAVE_ADVERSARIALLY_TRAINED_MODEL> \
---val_every 15 \
---adv_training_mode --freq_reg_mode \
---attack_name saa --rho 0.2 --steps 20 --block_size 32 32 32 --lambda_dice 0.01 --use_ssim_loss 
+--attack_name saa \
+--rho 0.4 --steps 10 --block_size 16 16 16 \
+--lambda_dice 0.2 --use_ssim_loss --lambda_ssim 0.75 \
+--save_adv_images_dir=$DATA/Medical-Datasets/Volumetric-Med-Seg/btcv-synapse/unet-saa/adv-test/
 ```
 
-Argument `--adv_training_mode` in conjunction with `--freq_reg_mode` performs adversarial training with dice loss on clean images, adversarial images and frequency regularization term in the objective function. For vanilla adversarial training (i.e. dice loss on adversarial images only), use only `--adv_training_mode`. For normal training of the model, do not mention these two arguments. 
+Use `--debugging` argument if adversarial images are not required to be saved. This repo supports three models: `unet`, `unet-r`, `swin-unetr`
 
 
 <a name="inference-on-the-model-with-already-saved-adversarial-images"/>
@@ -209,16 +180,8 @@ Argument `--adv_training_mode` in conjunction with `--freq_reg_mode` performs ad
 If adversarial images have already been saved and one wants to do inference on the model using saved adversarial images, use following command:
 
 ```shell
-python inference_on_saved_adv_samples.py --model_name unet-r --in_channels 1 --out_channel 14 --feature_size=16 --infer_overlap=0.5 \
---dataset btcv --data_dir=<PATH_OF_DATASET> \
---json_list=dataset_synapse_18_12.json \
---use_pretrained \
---pretrained_path=<PATH_OF_PRETRAINED_MODEL>  \
---adv_images_dir=<PATH_OF_SAVED_ADVERSARIAL_IMAGES> \ 
---attack_name saa --rho 0.2 --steps 20 --block_size 32 32 32 --lambda_dice 0.01 --use_ssim_loss 
-```
 
-Attack related arguments are used to automatically find the sub-folder containing adversarial images. Sub-folder should be present in parent folder path specified by `--adv_images_dir` argument. If `--no_sub_dir_adv_images` is mentioned, sub-folder will not be searched and images are assumed to be present directly in the parent folder path specified by `--adv_images_dir` argument. Structure of dataset folder should be same as specified in [Dataset](#dataset) section.
+```
 
 
 ## Results :microscope:
