@@ -41,8 +41,8 @@ In safety-critical domains like healthcare, resilience of deep learning models t
 
 ## Table of Contents
 - [Installation](#installation)
-- [Model](#model)
-- [Datasets](#dataset)
+- [Models](#models)
+- [Datasets](#datasets)
 - [Code Structure](#code-structure)
 - [Experiments](#experiments)
 - [Results](#results)
@@ -68,16 +68,16 @@ pip install -r requirements.txt
 ```
 
 
-<a name="model"/>
+<a name="models"/>
 
-## Model
+## Models :white_square_button:
 We have used three volumetric medical image segmentation models: [UNET](), [UNETR]() and [Swin-UNETR]()
 
 
 
-<a name="dataset"/>
+<a name="datasets"/>
 
-## Dataset
+## Datasets :page_with_curl:
 We conducted experiments on two volumetric medical image segmentation datasets: [Synapse](https://www.synapse.org/#!Synapse:syn3193805/wiki/217789), [ACDC](https://www.creatis.insa-lyon.fr/Challenge/acdc/databases.html). Synapse contains 14 classes (including background) and ACDC contains 4 classes (including background). We follow the same dataset preprocessing as in [nnFormer](https://github.com/282857341/nnFormer). 
 
 The dataset folders for Synapse should be organized as follows: 
@@ -111,42 +111,49 @@ You can use the command `tar -xzf btcv-synapse.tar.gz` to uncompress the file.
 
 <a name="code-structure"/>
 
-## Code Structure
+## Code Structure :snowflake:
 The repository is organized as follows:
 
 ```
 saa/
 ├── attacks/                    # Adversarial attack implementations
-│   ├── saa/                   # Spectrum Adversarial Attack (SAA) implementation
-│   │   ├── saa.py            # Main SAA attack class (3D)
-│   │   ├── compression.py    # 3D-DCT compression utilities
-│   │   ├── decompression.py  # 3D-IDCT decompression utilities
-│   │   └── utils.py          # SAA helper functions
-│   ├── vafa/                  # VAFA attack implementation (baseline)
-│   │   ├── vafa.py           # VAFA attack class
+│   ├── saa/                    # Spectrum Adversarial Attack (SAA) implementation
+│   │   ├── saa.py              # Main SAA attack class (3D)
+│   │   ├── compression.py      # 3D-DCT compression utilities
+│   │   ├── decompression.py    # 3D-IDCT decompression utilities
+│   │   └── utils.py            # SAA helper functions
+│   ├── vafa/                   # VAFA attack implementation (baseline)
+│   │   ├── vafa.py             # VAFA attack class
 │   │   └── ...
-│   ├── pgd.py                # Projected Gradient Descent attack
-│   ├── fgsm.py               # Fast Gradient Sign Method attack
-│   ├── bim.py                # Basic Iterative Method attack
-│   └── gn.py                 # Gaussian Noise attack
-├── utils/                     # Utility functions
-│   ├── data_utils.py         # Dataset loading and preprocessing
-│   ├── get_args.py           # Command-line argument parsing
-│   └── utils.py              # General utility functions
-├── optimizers/                # Optimizer implementations
-│   └── lr_scheduler.py       # Learning rate schedulers
-├── trainer.py                 # Training loop implementation
-├── generate_adv_samples.py   # Script to generate adversarial samples
+│   ├── pgd.py                  # Projected Gradient Descent attack
+│   ├── fgsm.py                 # Fast Gradient Sign Method attack
+│   ├── bim.py                  # Basic Iterative Method attack
+│   └── gn.py                   # Gaussian Noise attack
+├── utils/                      # Utility functions
+│   ├── data_utils.py           # Dataset loading and preprocessing
+│   ├── get_args.py             # Command-line argument parsing
+│   └── utils.py                # General utility functions
+├── optimizers/                 # Optimizer implementations
+│   └── lr_scheduler.py         # Learning rate schedulers
+├── trainer.py                  # Training loop implementation
+├── generate_adv_samples.py     # Script to generate adversarial samples
 ├── inference_on_saved_adv_samples.py  # Script for inference on saved adversarial samples
 ├── run_normal_or_adv_training.py      # Script for normal or adversarial training
-├── miscellaneous/            # Miscellaneous files
-│   └── dataset_synapse_18_12.json  # Dataset split file
-└── media/                    # Media files (figures, images)
+├── miscellaneous/                     # Miscellaneous files
+│   └── dataset_synapse_18_12.json     # Dataset split file
+└── media/                             # Media files (figures, images)
 ```
 
 The main attack implementations are located in the `attacks/` directory. The SAA (Spectrum Adversarial Attack) implementation is in `attacks/saa/`, which contains the core frequency-domain attack using 3D-DCT transformations. The `utils/` directory contains data loading, preprocessing, and general utility functions. Training and inference scripts are in the root directory.
 
 </br>
+
+
+
+
+<a name="run-experiments"/>
+
+## Run Experiments :zap:
 
 <a name="launch-saa-attack-on-the-model"/>
 
@@ -214,9 +221,24 @@ python inference_on_saved_adv_samples.py --model_name unet-r --in_channels 1 --o
 Attack related arguments are used to automatically find the sub-folder containing adversarial images. Sub-folder should be present in parent folder path specified by `--adv_images_dir` argument. If `--no_sub_dir_adv_images` is mentioned, sub-folder will not be searched and images are assumed to be present directly in the parent folder path specified by `--adv_images_dir` argument. Structure of dataset folder should be same as specified in [Dataset](#dataset) section.
 
 
+## Results :microscope:
+
+<a name="results"/>
+
+## Results :microscope:
+
+<div class="content has-text-justified"><p>
+
+
+![main figure](/media/attack_and_defense_results.png)
+
+</br>
+</br>
+
 <a name="citation"/>
 
-## Citation
+## Citation :star:
+
 If you find our work, or this repository useful, please consider giving a star :star: and citation.
 ```bibtex
 @inproceedings{hanif2025frequency,
