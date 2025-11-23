@@ -230,20 +230,22 @@ If you find our work, or this repository useful, please consider giving a star :
 }
 ```
 
-<hr />
+</br>
+</br>
 
 <a name="contact"/>
 
 ## Contact
 Should you have any question, please create an issue on this repository or contact at **asif.hanif@mbzuai.ac.ae**
 
-<hr />
+</br>
+</br>
 
 <a name="acknowledgement"/>
 
 ## Acknowledgement
 We thank the authors of [UNETR](https://github.com/Project-MONAI/research-contributions/tree/main/UNETR/BTCV), [nnFormer](https://github.com/282857341/nnFormer), and [MONAI](https://github.com/Project-MONAI/MONAI) for releasing their code and models.
 
-<hr />
+</br>
 
 
