@@ -28,6 +28,8 @@ In safety-critical domains like healthcare, resilience of deep learning models t
 
 > <b>TLDR:</b> A novel frequency domain attack on 3D medical segmentation exposes vulnerabilities, achieving high fooling rates, low cost, and superior transferability while preserving perceptual quality.
 
+| ![main figure](/media/saa_alg.png)|
+
 </br>
 </br>
 
@@ -160,15 +162,15 @@ The main attack implementations are located in the `attacks/` directory. The SAA
 ## Launch SAA Attack on the Model
 ```shell
 python generate_adv_samples.py --model_name unet --in_channels 1 --out_channel 14 --feature_size=16 --infer_overlap=0.5 \
---dataset btcv --data_dir $DATA/Medical-Datasets/volumetric-med-seg/btcv-synapse/ \
+--dataset btcv \
+--data_dir DATA_DIR/Medical-Datasets/volumetric-med-seg/btcv-synapse/ \
 --json_list dataset_synapse_18_12.json \
 --use_pretrained \
---pretrained_path=$DATA/Pre-Trained-Models/Volumetric-Med-Seg/unet/unet_synapse_18_12_clean/model_best.pt  \
+--pretrained_path=DATA_DIR/Pre-Trained-Models/Volumetric-Med-Seg/unet/unet_synapse_18_12_clean/model_best.pt  \
 --gen_val_adv_mode \
 --attack_name saa \
---rho 0.4 --steps 10 --block_size 16 16 16 \
---lambda_dice 0.2 --use_ssim_loss --lambda_ssim 0.75 \
---save_adv_images_dir=$DATA/Medical-Datasets/Volumetric-Med-Seg/btcv-synapse/unet-saa/adv-test/
+--rho 0.4 --steps 10 --block_size 16 16 16 --lambda_dice 0.2 --use_ssim_loss --lambda_ssim 0.75 \
+--save_adv_images_dir=DATA_DIR/Medical-Datasets/Volumetric-Med-Seg/btcv-synapse/unet-saa/adv-test/
 ```
 
 Use `--debugging` argument if adversarial images are not required to be saved. This repo supports three models: `unet`, `unet-r`, `swin-unetr`
@@ -180,7 +182,15 @@ Use `--debugging` argument if adversarial images are not required to be saved. T
 If adversarial images have already been saved and one wants to do inference on the model using saved adversarial images, use following command:
 
 ```shell
-
+python inference_on_saved_adv_samples.py --model_name unet --in_channels 1 --out_channel 14 --feature_size=16 --infer_overlap=0.5 \
+--dataset btcv \
+--data_dir DATA_DIR/Medical-Datasets/volumetric-med-seg/btcv-synapse/ \
+--json_list=dataset_synapse_18_12.json \
+--use_pretrained \
+--pretrained_path=DATA_DIR/Pre-Trained-Models/Volumetric-Med-Seg/unet/unet_synapse_18_12_clean/model_best.pt  \
+--attack_name saa \
+--rho 0.4 --steps 10 --block_size 16 16 16 --lambda_dice 0.2 --use_ssim_loss --lambda_ssim 0.75 \
+--adv_images_dir=DATA_DIR/Medical-Datasets/Volumetric-Med-Seg/btcv-synapse/unet-saa/adv-test/
 ```
 
 </br>
