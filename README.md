@@ -28,7 +28,9 @@ In safety-critical domains like healthcare, resilience of deep learning models t
 
 > <b>TLDR:</b> A novel frequency domain attack on 3D medical segmentation exposes vulnerabilities, achieving high fooling rates, low cost, and superior transferability while preserving perceptual quality.
 
-| ![main figure](/media/saa_alg.png)|
+<br><br>
+
+![main figure](/media/saa_alg.png)
 
 </br>
 </br>
@@ -159,7 +161,7 @@ The main attack implementations are located in the `attacks/` directory. The SAA
 
 <a name="launch-saa-attack-on-the-model"/>
 
-## Launch SAA Attack on the Model
+**Launch SAA Attack on the Model**
 ```shell
 python generate_adv_samples.py --model_name unet --in_channels 1 --out_channel 14 --feature_size=16 --infer_overlap=0.5 \
 --dataset btcv \
@@ -178,7 +180,7 @@ Use `--debugging` argument if adversarial images are not required to be saved. T
 
 <a name="inference-on-the-model-with-already-saved-adversarial-images"/>
 
-## Inference on the Model with already saved Adversarial Images
+**Inference with saved Adversarial Images**
 If adversarial images have already been saved and one wants to do inference on the model using saved adversarial images, use following command:
 
 ```shell
