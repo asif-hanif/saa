@@ -28,17 +28,19 @@ In safety-critical domains like healthcare, resilience of deep learning models t
 
 > <b>TLDR:</b> A novel frequency domain attack on 3D medical segmentation exposes vulnerabilities, achieving high fooling rates, low cost, and superior transferability while preserving perceptual quality.
 
-<br><br>
+</br>
+<hr />
+</br>
 
 ![main figure](/media/saa_alg.png)
 
 </br>
+<hr />
 </br>
 
 ## Updates :rocket:
 - **Jan 03, 2025** : Accepted in [ISBI 2025](https://biomedicalimaging.org/2025/) &nbsp;&nbsp; :confetti_ball: :tada:
 - **April 10, 2025** : Code released
-
 
 </br>
 </br>
@@ -71,13 +73,16 @@ cd saa
 pip install -r requirements.txt
 ```
 
+</br>
+</br>
 
 <a name="models"/>
 
 ## Models :white_square_button:
 We have used three volumetric medical image segmentation models: [UNET](), [UNETR]() and [Swin-UNETR]()
 
-
+</br>
+</br>
 
 <a name="datasets"/>
 
@@ -110,7 +115,6 @@ File `dataset_synapse_18_12.json` contains train-val split (created from train f
 You can use the command `tar -xzf btcv-synapse.tar.gz` to uncompress the file.
 
 </br>
-
 </br>
 
 <a name="code-structure"/>
@@ -151,9 +155,7 @@ saa/
 The main attack implementations are located in the `attacks/` directory. The SAA (Spectrum Adversarial Attack) implementation is in `attacks/saa/`, which contains the core frequency-domain attack using 3D-DCT transformations. The `utils/` directory contains data loading, preprocessing, and general utility functions. Training and inference scripts are in the root directory.
 
 </br>
-
-
-
+</br>
 
 <a name="run-experiments"/>
 
@@ -182,7 +184,7 @@ Use `--debugging` argument if adversarial images are not required to be saved. T
 
 <a name="inference-on-the-model-with-already-saved-adversarial-images"/>
 
-#### Inference with saved Adversarial Images** 
+#### Inference with saved Adversarial Images
 
 If adversarial images have already been saved and one wants to do inference on the model using saved adversarial images, use following command:
 
