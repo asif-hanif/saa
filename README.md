@@ -161,7 +161,7 @@ The main attack implementations are located in the `attacks/` directory. The SAA
 
 <a name="launch-saa-attack-on-the-model"/>
 
-### Launch SAA Attack on the Model
+#### Launch SAA Attack on the Model
 
 ```shell
 python generate_adv_samples.py --model_name unet --in_channels 1 --out_channel 14 --feature_size=16 --infer_overlap=0.5 \
@@ -182,10 +182,9 @@ Use `--debugging` argument if adversarial images are not required to be saved. T
 
 <a name="inference-on-the-model-with-already-saved-adversarial-images"/>
 
-**Inference with saved Adversarial Images** </br>
-If adversarial images have already been saved and one wants to do inference on the model using saved adversarial images, use following command:
+#### Inference with saved Adversarial Images** 
 
-</br>
+If adversarial images have already been saved and one wants to do inference on the model using saved adversarial images, use following command:
 
 ```shell
 python inference_on_saved_adv_samples.py --model_name unet --in_channels 1 --out_channel 14 --feature_size=16 --infer_overlap=0.5 \
