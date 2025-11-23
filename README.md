@@ -161,7 +161,7 @@ The main attack implementations are located in the `attacks/` directory. The SAA
 
 <a name="launch-saa-attack-on-the-model"/>
 
-**Launch SAA Attack on the Model** </br>
+*Launch SAA Attack on the Model*
 
 </br>
 
